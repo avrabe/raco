@@ -24,6 +24,14 @@ exclude_patterns = []
 
 html_theme = 'press'
 html_static_path = ["_static"]
+html_logo = "_static/images/raco-neon-small.svg"
+html_theme_options = {
+    'logo': '_static/images/raco-neon-small.svg',
+    'github_url': 'https://github.com/avrabe/raco',
+}
+html_css_files = [
+    "css/custom.css",
+]
 
 # PlantUML configuration
 # Using the installed plantuml executable

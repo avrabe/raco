@@ -1,0 +1,25 @@
+.wy-side-nav-search, .wy-nav-top {
+  background-color: #0A0A20 !important;
+}
+
+.wy-side-nav-search img {
+  max-width: 200px !important;
+  height: auto !important;
+  margin-bottom: 10px !important;
+}
+
+.logo {
+  width: auto !important;
+  height: 50px !important;
+}
+
+/* Press theme specific styles */
+.navbar-brand img {
+  height: 50px !important;
+  width: auto !important;
+  margin-right: 10px !important;
+}
+
+.header-logo {
+  max-height: 50px !important;
+} 

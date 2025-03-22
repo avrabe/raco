@@ -1,0 +1,27 @@
+{% extends "!layout.html" %}
+
+{% block extrahead %}
+{{ super() }}
+<style>
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+    }
+    
+    .navbar-brand img {
+        height: 40px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block nav_title %}
+    {% if logo %}
+    <a class="navbar-brand" href="{{ pathto(master_doc) }}">
+        <img src="{{ pathto('_static/images/raco-neon-cityscape.svg', 1) }}" alt="RACO Logo"/>
+        <span>{{ project }}</span>
+    </a>
+    {% else %}
+    <a class="navbar-brand" href="{{ pathto(master_doc) }}">{{ project }}</a>
+    {% endif %}
+{% endblock %} 
