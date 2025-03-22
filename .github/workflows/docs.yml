@@ -19,8 +19,7 @@ jobs:
           override: true
       - name: Install dependencies
         run: |
-          cargo install sphinx-needs-builders
-          pip install sphinx sphinx-rtd-theme sphinxcontrib-plantuml sphinx-needs
+          pip install -r docs/requirements.txt
           sudo apt-get update && sudo apt-get install -y plantuml
       - name: Install just
         uses: extractions/setup-just@v1
@@ -32,6 +31,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
-          destination_dir: sphinx
+          publish_dir: ./docs/_build/html
+          destination_dir: docs
           publish_branch: gh-pages 

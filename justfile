@@ -1,10 +1,73 @@
-# Default recipe to run when just is called without arguments
-default: build
+# RACO development tasks
+
+# Default task shows help
+default:
+    @just --list
+
+# Setup development environment
+setup:
+    cargo install cargo-watch
+    cargo install cargo-expand
+    cargo install cargo-sphinx
+    cargo install cargo-tarpaulin
+    cargo install sphinx-needs-builders
+    echo "Setup complete. You may need to install Python dependencies:"
+    echo "pip install -r docs/requirements.txt"
+
+# Run tests with coverage
+test:
+    cargo tarpaulin --workspace --exclude-files "*/tests/*" --out xml
+
+# Build project
+build:
+    cargo build --workspace
+
+# Run the CLI application
+run-cli *ARGS:
+    cargo run -p raco-cli -- {{ARGS}}
+
+# Run the web application
+run-web:
+    cargo run -p raco-web
+
+# Watch for changes and run tests
+watch-test:
+    cargo watch -x "test --workspace"
+
+# Watch for changes and run build
+watch-build:
+    cargo watch -x "build --workspace"
+
+# Format code
+fmt:
+    cargo fmt --all
+
+# Check code with clippy
+clippy:
+    cargo clippy --workspace --all-features -- -D warnings
+
+# Build documentation with diagrams
+docs-with-diagrams:
+    cd docs && sphinx-build -b html source _build/html
+
+# Clean build artifacts
+clean:
+    cargo clean
+    rm -rf docs/_build
+
+# Create a new release
+release VERSION:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Creating release v{{VERSION}}..."
+    git tag -a "v{{VERSION}}" -m "Release v{{VERSION}}"
+    git push origin "v{{VERSION}}"
+    echo "Release v{{VERSION}} created and pushed."
 
 # ----------------- Build Commands -----------------
 
 # Build all crates and WAT files
-build: build-wrt build-wrtd build-example build-wat-files
+build-wrt build-wrtd build-example build-wat-files
 
 # Build the core WRT library
 build-wrt:
@@ -91,15 +154,6 @@ check-docs:
     # Verify documentation builds with zero warnings
     {{sphinx_build}} -M html "{{sphinx_source}}" "{{sphinx_build_dir}}" {{sphinx_opts}} # -W
 
-# Run the CLI application
-run-cli *ARGS:
-    cargo run -p raco-cli -- {{ARGS}}
-
-# Run the web application
-run-web:
-    cargo run -p raco-web
-
-
 # Test wrtd with the example component (release mode)
 # Additional arguments can be passed with e.g. `just test-wrtd-example "--fuel 100 --stats"`
 test-wrtd-example *ARGS="--call example:hello/example#hello": setup-rust-targets build-example-release build-wrtd
@@ -154,10 +208,6 @@ test-wrtd-version: build-wrtd
 test-wrtd-all: test-wrtd-example test-wrtd-fuel test-wrtd-stats test-wrtd-help test-wrtd-version test-wrtd-no-call
 
 # ----------------- Code Quality Commands -----------------
-
-# Format all Rust code
-fmt:
-    cargo fmt
 
 # Check code style
 check:
@@ -455,14 +505,6 @@ check-wat-files:
     fi
 
 # ----------------- Utility Commands -----------------
-
-# Clean all build artifacts
-clean:
-    cargo clean
-    rm -f example/hello-world.wasm
-    rm -rf docs/_build
-    # Also clean generated WASM files
-    find examples -name "*.wasm" -type f -delete
 
 # Install rust targets required for the project
 setup-rust-targets:
