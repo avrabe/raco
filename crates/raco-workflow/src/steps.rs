@@ -51,10 +51,21 @@ pub trait Step: Debug + Send + Sync {
     /// Get the description of this step
     fn description(&self) -> &str;
 
+    /// Get the expected input schema for this step
+    fn input_schema(&self) -> Option<serde_json::Value>;
+
+    /// Get the expected output schema for this step
+    fn output_schema(&self) -> Option<serde_json::Value>;
+
     /// Execute the step
     async fn execute(&self, context: StepContext) -> Result<StepResult>;
 
     /// Validate step input
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the input does not meet the step's requirements
+    /// or if the input schema validation fails
     fn validate_input(&self, input: &serde_json::Value) -> Result<()>;
 
     /// Check if this step requires human input
@@ -108,6 +119,19 @@ impl Step for HumanInputStep {
 
     fn description(&self) -> &str {
         &self.description
+    }
+
+    fn input_schema(&self) -> Option<serde_json::Value> {
+        None // Human input step doesn't require specific input schema
+    }
+
+    fn output_schema(&self) -> Option<serde_json::Value> {
+        Some(serde_json::json!({
+            "type": "object",
+            "properties": {
+                "human_input": { "type": "string" }
+            }
+        }))
     }
 
     async fn execute(&self, _context: StepContext) -> Result<StepResult> {
@@ -177,6 +201,24 @@ impl Step for CodeGenerationStep {
         &self.description
     }
 
+    fn input_schema(&self) -> Option<serde_json::Value> {
+        Some(serde_json::json!({
+            "type": "object",
+            "properties": {
+                "parameters": { "type": "object" }
+            }
+        }))
+    }
+
+    fn output_schema(&self) -> Option<serde_json::Value> {
+        Some(serde_json::json!({
+            "type": "object",
+            "properties": {
+                "generated_code": { "type": "string" }
+            }
+        }))
+    }
+
     async fn execute(&self, _context: StepContext) -> Result<StepResult> {
         // In a real implementation, this would generate code based on the template
         // For now, we'll just return a dummy result
@@ -220,6 +262,14 @@ impl Step for MockStep {
 
     fn description(&self) -> &str {
         "A mock step for testing"
+    }
+
+    fn input_schema(&self) -> Option<serde_json::Value> {
+        None // Mock step doesn't have a specific input schema
+    }
+
+    fn output_schema(&self) -> Option<serde_json::Value> {
+        None // Mock step doesn't have a specific output schema
     }
 
     async fn execute(&self, _context: StepContext) -> Result<StepResult> {

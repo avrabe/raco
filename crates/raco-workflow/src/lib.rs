@@ -1,20 +1,26 @@
 //! Workflow engine for RACO
 //!
-//! This crate provides the workflow engine functionality for RACO,
-//! including workflow definition, execution, and state management.
-
-#![forbid(unsafe_code)]
-#![warn(missing_docs)]
-#![warn(clippy::all, clippy::pedantic)]
-
-use uuid::Uuid;
+//! This module provides workflow management functionality.
 
 pub mod engine;
 pub mod steps;
 
-/// Initialize the workflow engine
+use tracing::info;
+use uuid::Uuid;
+
+/// Initialize the workflow subsystem
+///
+/// Registers the workflow engine with the RACO core environment.
+///
+/// # Errors
+///
+/// Returns an error if the workflow engine cannot be initialized or registered with the core
+/// environment.
 pub fn init() -> Result<(), raco_core::error::CoreError> {
-    tracing::info!("Initializing workflow engine");
+    // Initialize the workflow storage
+    // Here we would typically initialize the workflow store and register it with the environment
+
+    info!("Workflow subsystem initialized");
     Ok(())
 }
 

@@ -24,6 +24,12 @@ pub struct MockTransport {
     auto_connect: bool,
 }
 
+impl Default for MockTransport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MockTransport {
     /// Create a new mock transport
     pub fn new() -> Self {
@@ -44,6 +50,13 @@ impl Transport for MockTransport {}
 #[cfg(feature = "transport-stdio")]
 #[derive(Debug)]
 pub struct StdioTransport;
+
+#[cfg(feature = "transport-stdio")]
+impl Default for StdioTransport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(feature = "transport-stdio")]
 impl StdioTransport {

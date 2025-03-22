@@ -115,9 +115,9 @@ async fn main() -> Result<()> {
         }
         Commands::Servers => {
             info!("Listing available servers");
-            println!("{}", "Available servers:".green().bold());
-            println!("- {}: {}", "filesystem".yellow(), "Local filesystem server");
-            println!("- {}: {}", "process".yellow(), "Process management server");
+            println!("Available servers:");
+            println!("- {}: Local filesystem server", "filesystem".yellow());
+            println!("- {}: Process management server", "process".yellow());
             Ok(())
         }
         Commands::Run {

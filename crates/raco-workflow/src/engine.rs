@@ -31,7 +31,7 @@ pub struct WorkflowDefinition {
     #[serde(skip)]
     pub steps: Vec<Box<dyn Step>>,
 
-    /// Dependencies between steps (from_step_id, to_step_id)
+    /// Dependencies between steps (`from_step_id`, `to_step_id`)
     pub dependencies: Vec<(StepId, StepId)>,
 }
 
@@ -45,7 +45,7 @@ pub struct WorkflowInstance {
     status: WorkflowStatus,
 
     /// Status of each step
-    step_status: HashMap<StepId, StepStatus>,
+    steps_statuses: HashMap<StepId, StepStatus>,
 
     /// Workflow execution graph
     #[allow(dead_code)]
@@ -63,10 +63,18 @@ pub struct WorkflowInstance {
 
     /// Completion time
     completed_at: Option<DateTime<Utc>>,
+
+    /// Dependencies between steps (`from_step_id`, `to_step_id`)
+    #[allow(dead_code)]
+    dependencies: Vec<(StepId, StepId)>,
 }
 
 impl WorkflowInstance {
     /// Create a new workflow instance from a definition
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the workflow definition is invalid or has circular dependencies
     pub fn new(definition: WorkflowDefinition) -> Result<Self> {
         let step_ids: HashSet<_> = definition.steps.iter().map(|step| step.id()).collect();
 
@@ -102,54 +110,65 @@ impl WorkflowInstance {
         }
 
         // Initialize step status
-        let mut step_status = HashMap::new();
+        let mut steps_statuses = HashMap::new();
         for step in &definition.steps {
-            step_status.insert(step.id(), StepStatus::Pending);
+            steps_statuses.insert(step.id(), StepStatus::Pending);
         }
+
+        // Clone dependencies before moving definition into the struct
+        let dependencies = definition.dependencies.clone();
 
         Ok(Self {
             definition,
             status: WorkflowStatus::Pending,
-            step_status,
+            steps_statuses,
             graph,
             node_map,
             created_at: Utc::now(),
             started_at: None,
             completed_at: None,
+            dependencies,
         })
     }
 
     /// Get the workflow ID
+    #[must_use]
     pub fn id(&self) -> WorkflowId {
         self.definition.id
     }
 
     /// Get the workflow status
+    #[must_use]
     pub fn status(&self) -> WorkflowStatus {
         self.status
     }
 
     /// Get the status of a step
+    #[must_use]
     pub fn step_status(&self, step_id: StepId) -> Option<StepStatus> {
-        self.step_status.get(&step_id).copied()
+        self.steps_statuses.get(&step_id).copied()
     }
 
     /// Get all step statuses
+    #[must_use]
     pub fn all_step_statuses(&self) -> &HashMap<StepId, StepStatus> {
-        &self.step_status
+        &self.steps_statuses
     }
 
     /// Get the creation time
+    #[must_use]
     pub fn created_at(&self) -> DateTime<Utc> {
         self.created_at
     }
 
     /// Get the start time
+    #[must_use]
     pub fn started_at(&self) -> Option<DateTime<Utc>> {
         self.started_at
     }
 
     /// Get the completion time
+    #[must_use]
     pub fn completed_at(&self) -> Option<DateTime<Utc>> {
         self.completed_at
     }
@@ -209,7 +228,7 @@ impl WorkflowEngine {
 
         // For now, we'll just mark everything as completed
         // In a real implementation, we would start executing steps based on the graph
-        for (step_id, status) in &mut instance.step_status {
+        for (step_id, status) in &mut instance.steps_statuses {
             *status = StepStatus::Completed;
             debug!("Completed step {} in workflow {}", step_id, id);
         }

@@ -4,6 +4,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::str::FromStr;
 
 /// MCP command types supported by RACO
 pub enum CommandType {
@@ -30,15 +31,23 @@ impl CommandType {
             Self::Register => "register",
         }
     }
+}
 
-    /// Parse from string
-    pub fn from_str(s: &str) -> Option<Self> {
+/// Error type for CommandType parsing
+#[derive(Debug, thiserror::Error)]
+#[error("invalid command type: {0}")]
+pub struct InvalidCommandType(String);
+
+impl FromStr for CommandType {
+    type Err = InvalidCommandType;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "execute" => Some(Self::Execute),
-            "query" => Some(Self::Query),
-            "monitor" => Some(Self::Monitor),
-            "register" => Some(Self::Register),
-            _ => None,
+            "execute" => Ok(Self::Execute),
+            "query" => Ok(Self::Query),
+            "monitor" => Ok(Self::Monitor),
+            "register" => Ok(Self::Register),
+            _ => Err(InvalidCommandType(s.to_string())),
         }
     }
 }
@@ -174,7 +183,7 @@ mod tests {
             CommandType::from_str("execute").unwrap().as_str(),
             "execute"
         );
-        assert!(CommandType::from_str("invalid").is_none());
+        assert!(CommandType::from_str("invalid").is_err());
     }
 
     #[test]
