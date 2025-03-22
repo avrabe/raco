@@ -1,0 +1,113 @@
+@startuml
+
+!define RECTANGLE class
+!define INTERFACE interface
+
+skinparam backgroundColor transparent
+skinparam componentStyle uml2
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam roundCorner 8
+
+title "RACO Agent - Overall Architecture"
+
+package "User Interfaces" {
+    [Console Interface] as ConsoleUI
+    [Web Interface] as WebUI
+}
+
+package "Core System" {
+    [Workflow Engine] as WorkflowEngine
+    [MCP Protocol Layer] as MCPLayer
+    [Dynamic Server Manager] as ServerManager
+    [Human Input Handler] as HumanInput
+    [LLM Integration] as LLMIntegration
+    [System Analyzer] as SysAnalyzer
+}
+
+package "Application Development" {
+    [Code Generator] as CodeGen
+    [Code Analyzer] as CodeAnalyzer
+    [Test Framework] as TestFramework
+    [Documentation Generator] as DocGen
+}
+
+package "Development Environment" {
+    [Filesystem Server] as FSServer
+    [Git Server] as GitServer
+    [Rust Toolchain Server] as RustServer
+    [Host Debugger] as HostDebug
+    [QEMU Zephyr Debugger] as ZephyrDebug
+}
+
+package "Technical Services" {
+    [Telemetry System] as Telemetry
+    [Security Manager] as Security
+    database "Workflow State Storage" as StateDB
+}
+
+cloud "External AI Models" as AIModels
+actor "User" as User
+
+User --> ConsoleUI : interacts
+User --> WebUI : interacts
+
+ConsoleUI --> WorkflowEngine : sends commands
+WebUI --> WorkflowEngine : sends commands
+
+WorkflowEngine --> HumanInput : requests input
+HumanInput --> User : prompts
+HumanInput --> WorkflowEngine : provides input
+
+WorkflowEngine --> MCPLayer : communicates
+MCPLayer --> AIModels : sends/receives
+
+WorkflowEngine --> CodeGen : orchestrates
+WorkflowEngine --> CodeAnalyzer : orchestrates
+WorkflowEngine --> TestFramework : orchestrates
+WorkflowEngine --> DocGen : orchestrates
+
+WorkflowEngine --> StateDB : persists state
+WorkflowEngine <-- StateDB : loads state
+
+MCPLayer --> LLMIntegration : uses
+LLMIntegration --> AIModels : integrates with
+
+MCPLayer --> ServerManager : manages servers
+ServerManager --> FSServer : configures
+ServerManager --> GitServer : configures
+ServerManager --> RustServer : configures
+ServerManager --> HostDebug : configures
+ServerManager --> ZephyrDebug : configures
+
+SysAnalyzer --> FSServer : scans system
+SysAnalyzer --> RustServer : detects toolchain
+SysAnalyzer --> ZephyrDebug : detects SDK
+
+CodeGen --> MCPLayer : uses
+CodeAnalyzer --> MCPLayer : uses
+TestFramework --> MCPLayer : uses
+DocGen --> MCPLayer : uses
+
+FSServer --> MCPLayer : registers with
+GitServer --> MCPLayer : registers with
+RustServer --> MCPLayer : registers with
+HostDebug --> MCPLayer : registers with
+ZephyrDebug --> MCPLayer : registers with
+
+Telemetry ..> ConsoleUI : monitors
+Telemetry ..> WebUI : monitors
+Telemetry ..> WorkflowEngine : monitors
+Telemetry ..> MCPLayer : monitors
+Telemetry ..> FSServer : monitors
+Telemetry ..> GitServer : monitors
+Telemetry ..> RustServer : monitors
+Telemetry ..> HostDebug : monitors
+Telemetry ..> ZephyrDebug : monitors
+
+Security ..> ConsoleUI : secures
+Security ..> WebUI : secures
+Security ..> MCPLayer : secures
+Security ..> StateDB : secures
+
+@enduml 

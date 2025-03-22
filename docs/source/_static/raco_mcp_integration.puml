@@ -1,0 +1,112 @@
+@startuml
+
+skinparam backgroundColor transparent
+skinparam componentStyle uml2
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam roundCorner 8
+
+title "RACO Agent - MCP Integration Architecture"
+
+package "RACO Agent" {
+    package "MCP Protocol Layer" {
+        [MCP Client] as MCPClient
+        [MCP Message Handler] as MessageHandler
+        [MCP Transport] as Transport
+        [MCP Server Registry] as ServerRegistry
+        [Dynamic Server Manager] as DynamicManager
+    }
+    
+    [Workflow Engine] as WorkflowEngine
+    [Human Input Handler] as HumanInput
+    [Application Development Tools] as DevTools
+    [System Analyzer] as SysAnalyzer
+}
+
+cloud "External MCP Servers" {
+    [Code Context Server] as CodeServer
+    [Documentation Server] as DocServer
+    [Testing Server] as TestServer
+    [Web Resource Server] as WebServer
+    
+    package "Development Servers" {
+        [Filesystem Server] as FSServer
+        [Git Server] as GitServer
+        [Rust Toolchain Server] as RustServer
+        [Debugger Servers] as DebugServers
+    }
+}
+
+cloud "AI Models" {
+    [LLM Provider] as LLM
+}
+
+database "External Resources" {
+    [File System] as FileSystem
+    [Code Repositories] as CodeRepo
+    [Web Resources] as WebResources
+    [Development Tools] as DevTools2
+}
+
+WorkflowEngine --> MCPClient : uses
+HumanInput --> MCPClient : provides input to
+DevTools --> MCPClient : uses capabilities
+SysAnalyzer --> MCPClient : uses for system scanning
+
+MCPClient --> MessageHandler : sends/receives
+MessageHandler --> Transport : transmits via
+Transport --> ServerRegistry : connects to servers in
+ServerRegistry --> CodeServer : registers
+ServerRegistry --> DocServer : registers
+ServerRegistry --> TestServer : registers
+ServerRegistry --> WebServer : registers
+ServerRegistry --> FSServer : registers
+ServerRegistry --> GitServer : registers
+ServerRegistry --> RustServer : registers
+ServerRegistry --> DebugServers : registers
+
+DynamicManager --> ServerRegistry : updates
+DynamicManager ..> FSServer : adds/configures dynamically
+DynamicManager ..> GitServer : adds/configures dynamically
+DynamicManager ..> RustServer : adds/configures dynamically
+DynamicManager ..> DebugServers : adds/configures dynamically
+
+CodeServer --> FileSystem : accesses
+CodeServer --> CodeRepo : accesses
+DocServer --> FileSystem : accesses
+TestServer --> FileSystem : accesses
+WebServer --> WebResources : accesses
+FSServer --> FileSystem : manages
+GitServer --> CodeRepo : manages
+RustServer --> DevTools2 : manages
+DebugServers --> DevTools2 : uses
+
+MCPClient --> LLM : communicates with
+
+note right of MCPClient
+  The MCP Client manages connections 
+  to external MCP servers and AI models,
+  providing a unified interface for
+  the RACO agent components.
+end note
+
+note right of DynamicManager
+  Manages the dynamic addition, 
+  configuration, and removal of MCP 
+  servers at runtime.
+end note
+
+note left of ServerRegistry
+  The Server Registry maintains 
+  information about available MCP 
+  servers, their capabilities, and
+  connection details.
+end note
+
+note bottom of Transport
+  Transport layer handles various
+  communication protocols including
+  stdio, WebSocket, and HTTP.
+end note
+
+@enduml 

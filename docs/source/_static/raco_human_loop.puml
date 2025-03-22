@@ -1,0 +1,79 @@
+@startuml
+
+skinparam backgroundColor transparent
+skinparam sequenceArrowThickness 2
+skinparam sequenceGroupBackgroundColor WhiteSmoke
+skinparam sequenceGroupBodyBackgroundColor WhiteSmoke
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+title "RACO Agent - Human-in-the-Loop Flow"
+
+actor "User" as User
+participant "Console/Web Interface" as UI
+participant "Workflow Engine" as WorkflowEngine
+participant "Human Input Handler" as HumanInputHandler
+participant "Input Validator" as InputValidator
+participant "Progress Reporter" as ProgressReporter
+participant "AI Model (via MCP)" as AIModel
+participant "Code Generator/Analyzer" as CodeTools
+
+== Workflow Initialization ==
+
+User -> UI: Request action
+UI -> WorkflowEngine: Initialize workflow
+WorkflowEngine -> ProgressReporter: Report workflow start
+ProgressReporter -> UI: Display workflow status
+WorkflowEngine -> AIModel: Request initial analysis
+
+== Human Input Request ==
+
+AIModel -> WorkflowEngine: Provide analysis/plan
+WorkflowEngine -> HumanInputHandler: Request human input
+HumanInputHandler -> UI: Display input form/prompt
+UI -> User: Present input request
+
+== Human Input Processing ==
+
+User -> UI: Provide input
+UI -> HumanInputHandler: Pass user input
+HumanInputHandler -> InputValidator: Validate input
+alt Valid Input
+    InputValidator -> HumanInputHandler: Input valid
+    HumanInputHandler -> WorkflowEngine: Provide validated input
+    WorkflowEngine -> AIModel: Process with human input
+    AIModel -> CodeTools: Generate/Analyze code
+    CodeTools -> WorkflowEngine: Return results
+    WorkflowEngine -> ProgressReporter: Update progress
+    ProgressReporter -> UI: Display updated status
+else Invalid Input
+    InputValidator -> HumanInputHandler: Input invalid
+    HumanInputHandler -> UI: Display validation error
+    UI -> User: Request corrected input
+end
+
+== Human Approval ==
+
+WorkflowEngine -> HumanInputHandler: Request approval
+HumanInputHandler -> UI: Display result for approval
+UI -> User: Present results
+User -> UI: Provide approval decision
+UI -> HumanInputHandler: Pass approval decision
+HumanInputHandler -> WorkflowEngine: Provide decision
+
+alt Approved
+    WorkflowEngine -> ProgressReporter: Mark step complete
+    ProgressReporter -> UI: Update workflow status
+    note right: Workflow continues to next step
+else Rejected
+    WorkflowEngine -> AIModel: Request revision
+    note right: Cycle repeats with new parameters
+end
+
+== Workflow Completion ==
+
+WorkflowEngine -> ProgressReporter: Report workflow complete
+ProgressReporter -> UI: Display completion status
+UI -> User: Present final results
+
+@enduml 

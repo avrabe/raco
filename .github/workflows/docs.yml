@@ -1,0 +1,37 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docs:
+    name: Build and deploy docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Install dependencies
+        run: |
+          cargo install sphinx-needs-builders
+          pip install sphinx sphinx-rtd-theme sphinxcontrib-plantuml sphinx-needs
+          sudo apt-get update && sudo apt-get install -y plantuml
+      - name: Install just
+        uses: extractions/setup-just@v1
+      - name: Build docs with diagrams
+        run: |
+          just docs-with-diagrams
+      - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html
+          destination_dir: sphinx
+          publish_branch: gh-pages 

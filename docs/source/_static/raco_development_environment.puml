@@ -1,0 +1,82 @@
+@startuml
+
+skinparam backgroundColor transparent
+skinparam componentStyle uml2
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam roundCorner 8
+
+title "RACO Agent - Development Environment Integration"
+
+package "RACO Agent" {
+    [MCP Protocol Layer] as MCPLayer
+    [Dynamic Server Manager] as ServerManager
+    [Workflow Engine] as WorkflowEngine
+    [System Analyzer] as SysAnalyzer
+}
+
+cloud "Development Environment MCP Servers" {
+    package "File Management" {
+        [Filesystem MCP Server] as FSServer
+        [Git MCP Server] as GitServer
+    }
+    
+    package "Build and Debugging" {
+        [Rust Toolchain MCP Server] as RustServer
+        [Host Debugger MCP Server] as HostDebugger
+        [QEMU Zephyr Debugger MCP Server] as ZephyrDebugger
+    }
+    
+    package "System Integration" {
+        [System Scanner MCP Server] as ScannerServer
+    }
+}
+
+database "Development Resources" {
+    folder "File System" as FileSystem
+    folder "Git Repositories" as GitRepos
+    folder "Rust Toolchain" as RustToolchain
+    folder "Zephyr SDK" as ZephyrSDK
+    folder "System Libraries" as SysLibs
+}
+
+MCPLayer --> ServerManager : manages
+ServerManager --> FSServer : registers/configures
+ServerManager --> GitServer : registers/configures
+ServerManager --> RustServer : registers/configures
+ServerManager --> HostDebugger : registers/configures
+ServerManager --> ZephyrDebugger : registers/configures
+ServerManager --> ScannerServer : registers/configures
+
+WorkflowEngine --> MCPLayer : uses
+SysAnalyzer --> ScannerServer : uses for scanning
+
+FSServer --> FileSystem : interacts with
+GitServer --> GitRepos : manages
+RustServer --> RustToolchain : manages
+HostDebugger --> RustToolchain : uses
+ZephyrDebugger --> ZephyrSDK : uses
+ScannerServer --> FileSystem : scans
+ScannerServer --> SysLibs : identifies
+ScannerServer --> RustToolchain : detects
+ScannerServer --> ZephyrSDK : detects
+
+note right of ServerManager
+  Dynamically manages MCP servers,
+  allowing runtime addition and
+  configuration of capabilities
+end note
+
+note right of SysAnalyzer
+  Performs initial system scanning
+  to configure optimal development
+  environment settings
+end note
+
+note bottom of ZephyrDebugger
+  Provides specialized tooling for
+  embedded development with QEMU
+  and Zephyr RTOS
+end note
+
+@enduml 

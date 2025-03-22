@@ -1,0 +1,99 @@
+@startuml
+
+skinparam backgroundColor transparent
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceArrowThickness 2
+skinparam roundCorner 8
+
+title "RACO Agent - Workflow System"
+
+package "Workflow Components" {
+    class WorkflowEngine {
+        +execute_workflow()
+        +pause_workflow()
+        +resume_workflow()
+        +get_workflow_state()
+    }
+    
+    class WorkflowDefinition {
+        +name: String
+        +steps: List<Step>
+        +dependencies: Map<StepId, List<StepId>>
+        +completion_criteria: Map<StepId, Criteria>
+    }
+    
+    class Step {
+        +id: String
+        +name: String
+        +description: String
+        +execute()
+        +validate()
+    }
+    
+    class CompletionCriteria {
+        +validate(state: State): Boolean
+    }
+    
+    class WorkflowState {
+        +workflow_id: String
+        +current_step: StepId
+        +completed_steps: List<StepId>
+        +step_results: Map<StepId, Result>
+        +persist()
+        +load()
+    }
+    
+    class WorkflowVisualizer {
+        +render_workflow(workflow: WorkflowDefinition)
+        +render_workflow_state(state: WorkflowState)
+    }
+}
+
+package "Step Types" {
+    class CodeGenerationStep {
+        +specification: String
+        +target_language: String
+        +execute()
+    }
+    
+    class CodeAnalysisStep {
+        +source_path: String
+        +analysis_type: String
+        +execute()
+    }
+    
+    class HumanInputStep {
+        +prompt: String
+        +input_type: String
+        +validation_rules: List<Rule>
+        +execute()
+    }
+    
+    class TestingStep {
+        +test_type: String
+        +test_path: String
+        +execute()
+    }
+    
+    class DocumentationStep {
+        +doc_type: String
+        +target_path: String
+        +execute()
+    }
+}
+
+WorkflowEngine --> WorkflowDefinition : uses
+WorkflowEngine --> WorkflowState : manages
+WorkflowDefinition --> Step : contains
+WorkflowDefinition --> CompletionCriteria : defines
+WorkflowVisualizer --> WorkflowDefinition : renders
+WorkflowVisualizer --> WorkflowState : renders
+
+Step <|-- CodeGenerationStep
+Step <|-- CodeAnalysisStep
+Step <|-- HumanInputStep
+Step <|-- TestingStep
+Step <|-- DocumentationStep
+
+@enduml 

@@ -1,0 +1,46 @@
+[package]
+name = "raco-workflow"
+version = "0.1.0"
+edition = "2021"
+description = "Workflow engine for RACO (Ralf's AI Code Orchestrator)"
+authors = ["RACO Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourusername/raco"
+readme = "../../README.md"
+
+[dependencies]
+# Internal dependencies
+raco-core = { path = "../raco-core" }
+raco-mcp = { path = "../raco-mcp" }
+
+# MCP framework
+mcp-agent-rs = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Async
+tokio = { workspace = true, features = ["sync", "rt", "time", "macros"] }
+futures = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+# Workflow-specific
+petgraph = "0.6"  # For workflow graph representation
+chrono = { version = "0.4", features = ["serde"] }
+derive_builder = "0.12"
+typed-builder = "0.15"
+async-trait = "0.1"
+strum = { version = "0.25", features = ["derive"] }
+uuid = { version = "1.4", features = ["v4", "serde"] }
+
+[dev-dependencies]
+tokio-test = { workspace = true }
+rstest = { workspace = true }
+mockall = "0.11" 
