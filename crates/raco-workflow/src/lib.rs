@@ -13,7 +13,7 @@ pub mod engine;
 pub mod steps;
 
 /// Initialize the workflow engine
-pub fn init() -> Result<(), raco_core::error::Error> {
+pub fn init() -> Result<(), raco_core::error::CoreError> {
     tracing::info!("Initializing workflow engine");
     Ok(())
 }
@@ -66,4 +66,4 @@ mod tests {
     fn test_init() {
         assert!(init().is_ok());
     }
-} 
+}

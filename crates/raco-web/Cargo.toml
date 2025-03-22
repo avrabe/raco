@@ -1,0 +1,43 @@
+[package]
+name = "raco-web"
+version = "0.1.0"
+edition = "2021"
+description = "Web interface for RACO"
+authors = ["RACO Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/avrabe/raco"
+readme = "README.md"
+
+[dependencies]
+# Internal crates
+raco-core = { path = "../raco-core" }
+raco-mcp = { path = "../raco-mcp" }
+raco-servers = { path = "../raco-servers" }
+raco-workflow = { path = "../raco-workflow" }
+
+# Web framework
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Async
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Utils
+uuid = { version = "1.3", features = ["v4", "serde"] }
+
+[dev-dependencies]
+rstest = { workspace = true } 

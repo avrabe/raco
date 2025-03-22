@@ -1,14 +1,18 @@
 [package]
-name = "raco-core"
+name = "raco-servers"
 version = "0.1.0"
 edition = "2021"
-description = "Core functionality and shared components for RACO (Ralf's AI Code Orchestrator)"
+description = "MCP server implementations for RACO"
 authors = ["RACO Contributors"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/avrabe/raco"
 readme = "README.md"
 
 [dependencies]
+# Internal crates
+raco-core = { path = "../raco-core" }
+raco-mcp = { path = "../raco-mcp" }
+
 # MCP framework
 mcp-agent-rs = { workspace = true }
 
@@ -27,12 +31,8 @@ futures = { workspace = true }
 # Logging
 tracing = { workspace = true }
 
-# Configuration
-config = { workspace = true }
-dotenvy = { workspace = true }
-
-# For default_data_dir in config.rs
-dirs = "5.0"
+# For UUIDs
+uuid = { version = "1.3", features = ["v4", "serde"] }
 
 [dev-dependencies]
 tokio-test = { workspace = true }
