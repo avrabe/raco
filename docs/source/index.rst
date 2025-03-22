@@ -29,7 +29,7 @@ Welcome to RACO Agent's documentation!
 Overview
 ========
 
-.. image:: _static/images/raco-neon-small.svg
+.. image:: _static/images/raco-minimal.svg
    :alt: RACO
    :width: 100px
    :align: right

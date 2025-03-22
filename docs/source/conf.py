@@ -24,9 +24,9 @@ exclude_patterns = []
 
 html_theme = 'press'
 html_static_path = ["_static"]
-html_logo = "_static/images/raco-neon-small.svg"
+html_logo = "_static/images/raco-minimal.svg"
 html_theme_options = {
-    'logo': '_static/images/raco-neon-small.svg',
+    'logo': '_static/images/raco-minimal.svg',
     'github_url': 'https://github.com/avrabe/raco',
 }
 html_css_files = [
